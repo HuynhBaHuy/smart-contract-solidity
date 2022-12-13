@@ -4,9 +4,9 @@ import { ethers, upgrades } from "hardhat";
 const proxyAddress: string = "0xe52975AcCa0558176C0d304FB936561D11b12Ba6";
 
 async function main(): Promise<void> {
-  console.log("Deploying  contract...");
+  console.log("Deploying Proxy contract...");
   const factory: ContractFactory = await ethers.getContractFactory("Swap");
-  const contract: Contract = await upgrades.forceImport(proxyAddress, factory);
+  const contract: Contract = await upgrades.upgradeProxy(proxyAddress, factory);
   await contract.deployed();
   console.log("Logic Proxy Contract deployed to : ", contract.address);
   console.log(
