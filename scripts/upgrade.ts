@@ -1,17 +1,17 @@
 import { Contract, ContractFactory } from "ethers";
 import { ethers, upgrades } from "hardhat";
 // 
-const proxyAddress: string = "0x344ED87d102eC99b94Aa6E63e82bac288F53e200";
+const proxyAddress: string = "0xe52975AcCa0558176C0d304FB936561D11b12Ba6";
 
 async function main(): Promise<void> {
   console.log("Deploying  contract...");
-  const Logic: ContractFactory = await ethers.getContractFactory("Swap");
-  const logic: Contract = await upgrades.upgradeProxy(proxyAddress, Logic);
-  await logic.deployed();
-  console.log("Logic Proxy Contract deployed to : ", logic.address);
+  const factory: ContractFactory = await ethers.getContractFactory("Swap");
+  const contract: Contract = await upgrades.forceImport(proxyAddress, factory);
+  await contract.deployed();
+  console.log("Logic Proxy Contract deployed to : ", contract.address);
   console.log(
     "Logic Contract implementation address is : ",
-    await upgrades.erc1967.getImplementationAddress(logic.address),
+    await upgrades.erc1967.getImplementationAddress(contract.address),
   );
 }
 

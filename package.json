@@ -8,6 +8,7 @@
     "deploy:bsc": "hardhat run --network bsc scripts/deploy.ts",
     "deploy:goerli": "hardhat run --network goerli scripts/deploy.ts",
     "deploy:tomoTest": "hardhat run --network tomoTest scripts/deploy.ts",
+    "upgrade:bsc": "hardhat run --network bsc scripts/upgrade.ts",
     "upgrade:bscTest": "hardhat run --network bscTest scripts/upgrade.ts",
     "upgrade:goerli": "hardhat run --network goerli scripts/upgrade.ts",
     "upgrade:tomoTest": "hardhat run --network tomoTest scripts/upgrade.ts",

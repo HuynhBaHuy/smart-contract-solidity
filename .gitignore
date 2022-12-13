@@ -9,3 +9,5 @@ typechain-types
 cache
 artifacts
 
+#OpenZeppelin files
+.openzeppelin/unknown-*.json

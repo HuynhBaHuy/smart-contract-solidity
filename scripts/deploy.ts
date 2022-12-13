@@ -6,14 +6,14 @@ dotenv.config()
 
 async function main() {  
   // // Step 1: deploy contract authority
-  const AuthorityFactory: ContractFactory = await ethers.getContractFactory("Authority");
-  const authority = await upgrades.deployProxy(
-    AuthorityFactory,
-    [],
-    { kind: "uups", "initializer": "initialize"}
-  )
-  await authority.deployed()
-  console.log(`Authority deployed to ${authority.address}`)
+  // const AuthorityFactory: ContractFactory = await ethers.getContractFactory("Authority");
+  // const authority = await upgrades.deployProxy(
+  //   AuthorityFactory,
+  //   [],
+  //   { kind: "uups", "initializer": "initialize"}
+  // )
+  // await authority.deployed()
+  // console.log(`Authority deployed to ${authority.address}`)
   
   // // Step 2: deploy contract token
   // const TokenFactory :ContractFactory = await ethers.getContractFactory("GovernanceToken")
@@ -29,7 +29,7 @@ async function main() {
   const TreasuryFactory :ContractFactory = await ethers.getContractFactory("Treasury")
   const treasury = await upgrades.deployProxy(
     TreasuryFactory,
-    [authority.address],
+    ["0xe856b3a5fE1a1cCB3eC3049BFB5463fb67Ca6230"],
     {kind: "uups", initializer: "initialize"}
     )
   await treasury.deployed()

@@ -71,7 +71,12 @@ contract Swap is
         address user = _msgSender();
         _onlyEOA(user);
         _checkBlacklist(user);
-        _safeERC20TransferFrom(token, user, address(treasury()), value_);
+        _safeERC20TransferFrom(
+            token,
+            user,
+            address(treasury()),
+            (value_ * 1 ether)
+        );
         value_ = ((value_ * 1 ether) * tokenPrice) / 10_000;
         IERC20Upgradeable _fiat = fiat;
         _safeERC20Transfer(_fiat, user, value_);
