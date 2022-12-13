@@ -60,7 +60,7 @@ contract Swap is
 
         _checkBlacklist(user_);
 
-        value_ = ((value_ * 1 ether) * tokenPrice) / 10_000;
+        value_ = (value_ * tokenPrice) / 10_000;
         IERC20Upgradeable _fiat = fiat;
         _safeERC20Transfer(_fiat, user_, value_);
 
@@ -75,16 +75,16 @@ contract Swap is
             token,
             user,
             address(treasury()),
-            (value_ * 1 ether)
+            value_
         );
-        value_ = ((value_ * 1 ether) * tokenPrice) / 10_000;
+        value_ = (value_ * tokenPrice) / 10_000;
         IERC20Upgradeable _fiat = fiat;
         _safeERC20Transfer(_fiat, user, value_);
 
         emit Swapped(_fiat, user, value_);
     }
     function widthdrawFiat(uint256 value_) external onlyRole(Roles.OPERATOR_ROLE) {
-        _safeERC20Transfer(fiat, _msgSender(), (value_*1 ether));
+        _safeERC20Transfer(fiat, _msgSender(), value_);
     }
     uint256[47] private __gap;
 }
