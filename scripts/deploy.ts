@@ -26,14 +26,14 @@ async function main() {
   // console.log(`Token address: ${token.address}`) 
 
   // // Step 3: deploy contract treasury
-  const TreasuryFactory :ContractFactory = await ethers.getContractFactory("Treasury")
-  const treasury = await upgrades.deployProxy(
-    TreasuryFactory,
-    ["0xe856b3a5fE1a1cCB3eC3049BFB5463fb67Ca6230"],
-    {kind: "uups", initializer: "initialize"}
-    )
-  await treasury.deployed()
-  console.log(`Treasury address: ${treasury.address}`) 
+  // const TreasuryFactory :ContractFactory = await ethers.getContractFactory("Treasury")
+  // const treasury = await upgrades.deployProxy(
+  //   TreasuryFactory,
+  //   ["0xe856b3a5fE1a1cCB3eC3049BFB5463fb67Ca6230"],
+  //   {kind: "uups", initializer: "initialize"}
+  //   )
+  // await treasury.deployed()
+  // console.log(`Treasury address: ${treasury.address}`) 
   
   // // TESTNET ONLY: deploy contract payment token for testing : testnet
   // const PMTFactory:ContractFactory = await ethers.getContractFactory("PMToken")
@@ -42,14 +42,14 @@ async function main() {
   // console.log(`PMT address: ${pmt.address}`) 
   
   // Step 4: deploy contract Swapped
-  // const SwappedFactory :ContractFactory = await ethers.getContractFactory("Swap")
-  // const swap = await upgrades.deployProxy(
-  //   SwappedFactory,
-  //   ["0xa8CBA1c1793d7Ad0C98167f97FCCEB7Cc69dca88","0xB5647784312E67EBe8F1E374bfD6B39D963658c2","500", "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", "0xbaEff6FB1C4B07D7F6625Fb81B4E6D6363fc503F"],
-  //   {kind: "uups", initializer: "initialize"}
-  //   )
-  // await swap.deployed()
-  // console.log(`Swap address: ${swap.address}`) 
+  const SwappedFactory :ContractFactory = await ethers.getContractFactory("Swap")
+  const swap = await upgrades.deployProxy(
+    SwappedFactory,
+    ["0x47603421d83c6811AE0C9c7682A59254AEf2581f","0xBa21830C55089c550a4889F7aaC0FEd75e419183","500", "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", "0xf8FF4bCbC801FA40D25ee3BF0197b9EF4ce0Ec05"],
+    {kind: "uups", initializer: "initialize"}
+    )
+  await swap.deployed()
+  console.log(`Swap address: ${swap.address}`) 
   
   // Step 5: deploy contract binary plan
   // const BinaryPlanFactory: ContractFactory = await ethers.getContractFactory("BinaryPlan");
