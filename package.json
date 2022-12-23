@@ -25,6 +25,7 @@
     "test": "hardhat test --network hardhat"
   },
   "devDependencies": {
+    "@chainlink/contracts": "^0.5.1",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.4",
@@ -40,7 +41,9 @@
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.0",
     "@types/node": "^18.11.9",
+    "@uniswap/v2-core": "^1.0.1",
     "chai": "^4.3.7",
+    "cross-env": "^7.0.3",
     "ethers": "^5.7.2",
     "hardhat": "^2.12.2",
     "hardhat-contract-sizer": "^2.6.1",

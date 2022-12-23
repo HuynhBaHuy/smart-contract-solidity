@@ -83,8 +83,8 @@ contract Swap is
 
         emit Swapped(_fiat, user, value_);
     }
-    function widthdrawFiat(uint256 value_) external onlyRole(Roles.OPERATOR_ROLE) {
-        _safeERC20Transfer(fiat, _msgSender(), value_);
+    function widthdraw(IERC20Upgradeable token_, address to_ ,uint256 value_) external onlyRole(Roles.OPERATOR_ROLE) {
+        _safeERC20Transfer(token_, to_, value_);
     }
     uint256[47] private __gap;
 }

@@ -1,0 +1,6 @@
+ds-test/=lib/forge-std/lib/ds-test/src/
+forge-std/=lib/forge-std/src
+hardhat/=node_modules/hardhat/
+@openzeppelin/=node_modules/@openzeppelin
+@uniswap/=node_modules/@uniswap
+@chainlink/=node_modules/@chainlink

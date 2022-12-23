@@ -1,7 +1,7 @@
 import { Contract, ContractFactory } from "ethers";
 import { ethers, upgrades } from "hardhat";
 // 
-const proxyAddress: string = "0xe52975AcCa0558176C0d304FB936561D11b12Ba6";
+const proxyAddress: string = "0x5f4f96d8e850b6b9b21fb65b1dd44224d69eb22b";
 
 async function main(): Promise<void> {
   console.log("Deploying Proxy contract...");
