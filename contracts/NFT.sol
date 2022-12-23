@@ -87,7 +87,12 @@ contract NFTCollection is
         //TODO 
         tokenERC20ToFeeds[address(_token)] = address(_tokenToUSDFeed);
     }
-    
+    function updateSellToken(IERC20Upgradeable _token, AggregatorV3Interface _tokenToUSDFeed) external onlyRole(OPERATOR_ROLE) {
+        //TODO 
+        sellTokenContract = _token;
+        tokenERC20ToFeeds[address(_token)] = address(_tokenToUSDFeed);
+    }
+
     // public
     function mint(address _to, uint256 _mintAmount, address _paymentToken) external whenNotPaused {
         uint256 supply = totalSupply();
@@ -112,7 +117,7 @@ contract NFTCollection is
                 (, int256 sellTokenToUsdPrice, , , ) = feedSellToken.latestRoundData();
                 uint price = cost.mul(_mintAmount).mulDivDown(uint(paymentTokenToUsdPrice), uint(sellTokenToUsdPrice));
                 _safeTransferFrom(
-                    sellTokenContract,
+                    IERC20Upgradeable(_paymentToken),
                     sender,
                     owner,
                     price
