@@ -35,10 +35,13 @@ contract WhiteList is
 
     EnumerableSetUpgradeable.AddressSet private __payments;
 
-    function initialize(IAuthority authority_) external initializer {
+    mapping(address => bool) public withdrawed;
+    uint public maxWithdrawAmount;
+
+    function initialize(IAuthority authority_, uint maxAmount_) external initializer {
         /// @dev support native payment
         __addPayment(address(0));
-
+        maxWithdrawAmount = maxAmount_;
         __ReentrancyGuard_init_unchained();
         __Base_init_unchained(authority_, 0);
         __EIP712_init_unchained(type(WhiteList).name, "1");
@@ -71,13 +74,18 @@ contract WhiteList is
         emit WhiteListUserAdded(_user);
     }
 
+
     function whiteListWithdraw(
         IERC20Upgradeable token_,
         address to_,
         uint256 amount_
     ) external nonReentrant whenNotPaused {
         require(whitelisted[to_], "TREASURY: NOT_WHITELISTED");
+        require(!withdrawed[to_], "TREASURY: ALREADY_WITHDRAWED");
+        require(amount_ <= maxWithdrawAmount, "TREASURY: AMOUNT_EXCEEDS_MAX");
+
         _safeTransfer(token_, to_, amount_);
+        withdrawed[to_] = true;
         emit Withdrawn(token_, to_, amount_);
     }
 
@@ -176,6 +184,10 @@ contract WhiteList is
     function supportedPayment(address token_) public view returns (bool) {
         return __payments.contains(token_);
     }
+    
+    function setMaxWithdrawAmount(uint256 _amount) external onlyRole(Roles.TREASURER_ROLE) {
+        maxWithdrawAmount = _amount;
+    }
 
-    uint256[49] private __gap;
+    uint256[47] private __gap;
 }
