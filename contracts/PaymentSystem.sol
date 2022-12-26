@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+import "./interfaces/IPayment.sol";
 import "./internal-upgradeable/BaseUpgradeable.sol";
 import "./internal-upgradeable/FundForwarderUpgradeable.sol";
 
@@ -14,7 +15,9 @@ import {FixedPointMathLib} from "./libraries/FixedPointMathLib.sol";
 contract PaymentSystem is
     BaseUpgradeable,
     TransferableUpgradeable,
-    FundForwarderUpgradeable
+    FundForwarderUpgradeable,
+    IPayment
+    
 {
     using FixedPointMathLib for uint256;
 
@@ -37,42 +40,42 @@ contract PaymentSystem is
         __Base_init_unchained(authority_, Roles.TREASURER_ROLE);
     }
 
-    function updateSupportedTokenPayment(
-        IERC20Upgradeable _token,
-        AggregatorV3Interface _tokenFeed
+    function supportPaymentToken (
+        IERC20Upgradeable token_,
+        AggregatorV3Interface feed_
     ) external onlyRole(Roles.OPERATOR_ROLE) {
         //TODO
-        _updateTokenFeed(address(_token), _tokenFeed);
+        _updateTokenFeed(address(token_), feed_);
     }
 
     function updateBaseToken(
-        IERC20Upgradeable _token,
-        AggregatorV3Interface _tokenFeed
+        IERC20Upgradeable token_,
+        AggregatorV3Interface feed_
     ) external onlyRole(Roles.OPERATOR_ROLE) {
         //TODO
-        baseToken = _token;
-        _updateTokenFeed(address(_token), _tokenFeed);
+        baseToken = token_;
+        _updateTokenFeed(address(token_), feed_);
     }
 
     function _updateTokenFeed(
-        address _token,
-        AggregatorV3Interface _tokenFeed
-    ) internal {
+        address token_,
+        AggregatorV3Interface feed_
+    ) private {
         //TODO
-        tokenFeeds[_token] = address(_tokenFeed);
+        tokenFeeds[token_] = address(feed_);
     }
 
-    modifier supportedTokenPayment(address _token) {
-        require(tokenFeeds[_token] != address(0), "Token not supported");
+    modifier supportedTokenPayment(address token_) {
+        require(tokenFeeds[token_] != address(0), "Token not supported");
         _;
     }
 
-    function _getPrice(address _token) internal view returns (uint256) {
+    function _getPrice(address token_) internal view returns (uint256) {
         //TODO
-        if (_token == address(0)) {
+        if (token_ == address(0)) {
             return _getNativePrice();
         } else {
-            return _getERC20Price(_token);
+            return _getERC20Price(token_);
         }
     }
 
@@ -82,24 +85,24 @@ contract PaymentSystem is
         return uint256(price);
     }
 
-    function _getERC20Price(address _token) internal view returns (uint256) {
+    function _getERC20Price(address token_) internal view returns (uint256) {
         //TODO
-        (, int256 price, , , ) = AggregatorV3Interface(tokenFeeds[_token])
+        (, int256 price, , , ) = AggregatorV3Interface(tokenFeeds[token_])
             .latestRoundData();
         return uint256(price);
     }
 
     function exchange(
-        address _token,
-        uint256 _amount
-    ) external payable supportedTokenPayment(_token) {
+        address token_,
+        uint256 amount_
+    ) external supportedTokenPayment(token_) {
         ITreasury _treasury = treasury();
         //TODO
-        uint256 tokenPrice = _getPrice(_token);
+        uint256 tokenPrice = _getPrice(token_);
         uint256 baseTokenPrice = _getPrice(address(baseToken));
-        uint256 amount = _amount.mulDivDown(tokenPrice, baseTokenPrice);
+        uint256 amount = amount_.mulDivDown(tokenPrice, baseTokenPrice);
         _safeERC20TransferFrom(
-            IERC20Upgradeable(_token),
+            IERC20Upgradeable(token_),
             _msgSender(),
             address(_treasury),
             amount
