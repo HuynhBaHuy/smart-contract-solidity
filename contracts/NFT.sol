@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.17;
+pragma solidity 0.8.17;
 
 import "./internal-upgradeable/TransferableUpgradeable.sol";
 
@@ -12,8 +12,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
-
-import { FixedPointMathLib } from "./libraries/FixedPointMathLib.sol";
+import {FixedPointMathLib} from "./libraries/FixedPointMathLib.sol";
 
 contract NFTCollection is
     UUPSUpgradeable,
@@ -56,7 +55,7 @@ contract NFTCollection is
         AggregatorV3Interface native2USD_
     ) external initializer {
         address sender = _msgSender();
-        native2USD_ = native2USD;
+        native2USD = native2USD_;
         tokenERC20ToFeeds[address(sellTokenContract_)] = sellTokenToUSDFeed_;
         owner = sender;
         cost = 300 ether;
@@ -83,18 +82,30 @@ contract NFTCollection is
         uint256 indexed _mintAmount,
         address owner
     );
-    function updateSupportedTokenPayment(IERC20Upgradeable _token, AggregatorV3Interface _tokenToUSDFeed) external onlyRole(OPERATOR_ROLE) {
-        //TODO 
+
+    function updateSupportedTokenPayment(
+        IERC20Upgradeable _token,
+        AggregatorV3Interface _tokenToUSDFeed
+    ) external onlyRole(OPERATOR_ROLE) {
+        //TODO
         tokenERC20ToFeeds[address(_token)] = address(_tokenToUSDFeed);
     }
-    function updateSellToken(IERC20Upgradeable _token, AggregatorV3Interface _tokenToUSDFeed) external onlyRole(OPERATOR_ROLE) {
-        //TODO 
+
+    function updateSellToken(
+        IERC20Upgradeable _token,
+        AggregatorV3Interface _tokenToUSDFeed
+    ) external onlyRole(OPERATOR_ROLE) {
+        //TODO
         sellTokenContract = _token;
         tokenERC20ToFeeds[address(_token)] = address(_tokenToUSDFeed);
     }
 
     // public
-    function mint(address _to, uint256 _mintAmount, address _paymentToken) external whenNotPaused {
+    function mint(
+        address _to,
+        uint256 _mintAmount,
+        address _paymentToken
+    ) external whenNotPaused {
         uint256 supply = totalSupply();
         require(_mintAmount > 0);
         require(_mintAmount <= maxMintAmount);
@@ -106,16 +117,25 @@ contract NFTCollection is
         address sender = _msgSender();
         if (!hasRole(MINTER_ROLE, sender)) {
             if (whitelisted[sender] != true) {
-                int256 paymentTokenToUsdPrice; 
-                if(_paymentToken == address(0)){
-                    (, paymentTokenToUsdPrice, , , ) = native2USD.latestRoundData();
-                }else {
-                    AggregatorV3Interface feed = AggregatorV3Interface(tokenERC20ToFeeds[_paymentToken]);
+                int256 paymentTokenToUsdPrice;
+                if (_paymentToken == address(0)) {
+                    (, paymentTokenToUsdPrice, , , ) = native2USD
+                        .latestRoundData();
+                } else {
+                    AggregatorV3Interface feed = AggregatorV3Interface(
+                        tokenERC20ToFeeds[_paymentToken]
+                    );
                     (, paymentTokenToUsdPrice, , , ) = feed.latestRoundData();
                 }
-                AggregatorV3Interface feedSellToken = AggregatorV3Interface(tokenERC20ToFeeds[address(sellTokenContract)]);
-                (, int256 sellTokenToUsdPrice, , , ) = feedSellToken.latestRoundData();
-                uint price = cost.mul(_mintAmount).mulDivDown(uint(paymentTokenToUsdPrice), uint(sellTokenToUsdPrice));
+                AggregatorV3Interface feedSellToken = AggregatorV3Interface(
+                    tokenERC20ToFeeds[address(sellTokenContract)]
+                );
+                (, int256 sellTokenToUsdPrice, , , ) = feedSellToken
+                    .latestRoundData();
+                uint price = cost.mul(_mintAmount).mulDivDown(
+                    uint(paymentTokenToUsdPrice),
+                    uint(sellTokenToUsdPrice)
+                );
                 _safeTransferFrom(
                     IERC20Upgradeable(_paymentToken),
                     sender,

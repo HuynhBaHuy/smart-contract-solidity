@@ -71,20 +71,21 @@ contract Swap is
         address user = _msgSender();
         _onlyEOA(user);
         _checkBlacklist(user);
-        _safeERC20TransferFrom(
-            token,
-            user,
-            address(treasury()),
-            value_
-        );
+        _safeERC20TransferFrom(token, user, address(treasury()), value_);
         value_ = (value_ * tokenPrice) / 10_000;
         IERC20Upgradeable _fiat = fiat;
         _safeERC20Transfer(_fiat, user, value_);
 
         emit Swapped(_fiat, user, value_);
     }
-    function widthdraw(IERC20Upgradeable token_, address to_ ,uint256 value_) external onlyRole(Roles.OPERATOR_ROLE) {
+
+    function widthdraw(
+        IERC20Upgradeable token_,
+        address to_,
+        uint256 value_
+    ) external onlyRole(Roles.OPERATOR_ROLE) {
         _safeERC20Transfer(token_, to_, value_);
     }
+
     uint256[47] private __gap;
 }

@@ -29,11 +29,21 @@ async function main() {
   // const TreasuryFactory :ContractFactory = await ethers.getContractFactory("Treasury")
   // const treasury = await upgrades.deployProxy(
   //   TreasuryFactory,
-  //   ["0xe856b3a5fE1a1cCB3eC3049BFB5463fb67Ca6230"],
+  //   ["0x15A8261C026cFfA2efa53DB3594559c790e20ff1"],
   //   {kind: "uups", initializer: "initialize"}
   //   )
   // await treasury.deployed()
   // console.log(`Treasury address: ${treasury.address}`) 
+  
+  // // Step 3.1: deploy contract whitelist
+  const WhiteListFactory :ContractFactory = await ethers.getContractFactory("WhiteList")
+  const whiteList = await upgrades.deployProxy(
+    WhiteListFactory,
+    ["0xc2a04b816fe6b531b5e8100e78f9dc420b081b20"],
+    {kind: "uups", initializer: "initialize"}
+    )
+  await whiteList.deployed()
+  console.log(`whiteList address: ${whiteList.address}`) 
   
   // // TESTNET ONLY: deploy contract payment token for testing : testnet
   // const PMTFactory:ContractFactory = await ethers.getContractFactory("PMToken")
@@ -42,14 +52,14 @@ async function main() {
   // console.log(`PMT address: ${pmt.address}`) 
   
   // Step 4: deploy contract Swapped
-  const SwappedFactory :ContractFactory = await ethers.getContractFactory("Swap")
-  const swap = await upgrades.deployProxy(
-    SwappedFactory,
-    ["0x47603421d83c6811AE0C9c7682A59254AEf2581f","0xBa21830C55089c550a4889F7aaC0FEd75e419183","500", "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", "0xf8FF4bCbC801FA40D25ee3BF0197b9EF4ce0Ec05"],
-    {kind: "uups", initializer: "initialize"}
-    )
-  await swap.deployed()
-  console.log(`Swap address: ${swap.address}`) 
+  // const SwappedFactory :ContractFactory = await ethers.getContractFactory("Swap")
+  // const swap = await upgrades.deployProxy(
+  //   SwappedFactory,
+  //   ["0x47603421d83c6811AE0C9c7682A59254AEf2581f","0xBa21830C55089c550a4889F7aaC0FEd75e419183","500", "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", "0xf8FF4bCbC801FA40D25ee3BF0197b9EF4ce0Ec05"],
+  //   {kind: "uups", initializer: "initialize"}
+  //   )
+  // await swap.deployed()
+  // console.log(`Swap address: ${swap.address}`) 
   
   // Step 5: deploy contract binary plan
   // const BinaryPlanFactory: ContractFactory = await ethers.getContractFactory("BinaryPlan");
@@ -86,7 +96,15 @@ async function main() {
 
 
 
-
+  // Step x: deploy contract PaymentSystem
+  // const PaymentSystemFactory :ContractFactory = await ethers.getContractFactory("PaymentSystem")
+  // const paymentSystem = await upgrades.deployProxy(
+  //   PaymentSystemFactory,
+  //   ["0x540f0552f770e4E98C0aE0448386A8D34685C193","0xf8FF4bCbC801FA40D25ee3BF0197b9EF4ce0Ec05"],
+  //   {kind: "uups", initializer: "initialize"}
+  //   )
+  // await paymentSystem.deployed()
+  // console.log(`PaymentSystem address: ${paymentSystem.address}`)
 
 
 
