@@ -9,4 +9,5 @@ interface IPayment {
     function updateBaseToken (IERC20Upgradeable token_, AggregatorV3Interface feed_) external;
     function exchange (address token_, uint256 amount_) external view returns (uint256);
     function deposit (address token_, uint amount_) external;
+    function getPrice (address token_) external view returns (uint256);
 }

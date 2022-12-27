@@ -91,6 +91,10 @@ contract PaymentSystem is
         _updateTreasury(treasury_);
     }
 
+    function getPrice(address token_) external view returns (uint256) {
+        return _getPrice(token_);
+    }
+
     function _updateTokenFeed(
         address token_,
         AggregatorV3Interface feed_
