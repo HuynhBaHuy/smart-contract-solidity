@@ -7,5 +7,6 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 interface IPayment {
     function supportPaymentToken (IERC20Upgradeable token_, AggregatorV3Interface feed_) external;
     function updateBaseToken (IERC20Upgradeable token_, AggregatorV3Interface feed_) external;
-    function exchange(address token_, uint256 amount_) external;
+    function exchange (address token_, uint256 amount_) external view returns (uint256);
+    function deposit (address token_, uint amount_) external;
 }

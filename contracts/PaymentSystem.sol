@@ -4,6 +4,7 @@ pragma solidity 0.8.17;
 import "./interfaces/IPayment.sol";
 import "./internal-upgradeable/BaseUpgradeable.sol";
 import "./internal-upgradeable/FundForwarderUpgradeable.sol";
+import "./internal-upgradeable/ProxyCheckerUpgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -15,6 +16,7 @@ import {FixedPointMathLib} from "./libraries/FixedPointMathLib.sol";
 contract PaymentSystem is
     BaseUpgradeable,
     TransferableUpgradeable,
+    ProxyCheckerUpgradeable,
     FundForwarderUpgradeable,
     IPayment
     
@@ -40,6 +42,10 @@ contract PaymentSystem is
         __Base_init_unchained(authority_, Roles.TREASURER_ROLE);
     }
 
+    modifier supportedTokenPayment(address token_) {
+        require(tokenFeeds[token_] != address(0), "Token not supported");
+        _;
+    }
     function supportPaymentToken (
         IERC20Upgradeable token_,
         AggregatorV3Interface feed_
@@ -57,6 +63,34 @@ contract PaymentSystem is
         _updateTokenFeed(address(token_), feed_);
     }
 
+
+    function deposit(
+        address token_,
+        uint256 amount_
+    ) external supportedTokenPayment(token_) {
+        ITreasury _treasury = treasury();
+        uint amount = _exchange(token_, amount_);
+        _safeERC20TransferFrom(
+            IERC20Upgradeable(token_),
+            _msgSender(),
+            address(_treasury),
+            amount
+        );
+    }
+
+    function exchange (address token_, uint amount_) external view returns(uint256) {
+        //TODO
+        return _exchange(token_, amount_);
+    }
+
+
+    function updateTreasury(
+        ITreasury treasury_
+    ) external override onlyRole(Roles.OPERATOR_ROLE) {
+        emit TreasuryUpdated(treasury(), treasury_);
+        _updateTreasury(treasury_);
+    }
+
     function _updateTokenFeed(
         address token_,
         AggregatorV3Interface feed_
@@ -65,10 +99,6 @@ contract PaymentSystem is
         tokenFeeds[token_] = address(feed_);
     }
 
-    modifier supportedTokenPayment(address token_) {
-        require(tokenFeeds[token_] != address(0), "Token not supported");
-        _;
-    }
 
     function _getPrice(address token_) internal view returns (uint256) {
         //TODO
@@ -92,27 +122,14 @@ contract PaymentSystem is
         return uint256(price);
     }
 
-    function exchange(
-        address token_,
-        uint256 amount_
-    ) external supportedTokenPayment(token_) {
-        ITreasury _treasury = treasury();
+
+
+    function _exchange (address token_, uint amount_) private view returns(uint256) {
         //TODO
         uint256 tokenPrice = _getPrice(token_);
         uint256 baseTokenPrice = _getPrice(address(baseToken));
-        uint256 amount = amount_.mulDivDown(tokenPrice, baseTokenPrice);
-        _safeERC20TransferFrom(
-            IERC20Upgradeable(token_),
-            _msgSender(),
-            address(_treasury),
-            amount
-        );
+        return amount_.mulDivDown(tokenPrice, baseTokenPrice);
     }
 
-    function updateTreasury(
-        ITreasury treasury_
-    ) external override onlyRole(Roles.OPERATOR_ROLE) {
-        emit TreasuryUpdated(treasury(), treasury_);
-        _updateTreasury(treasury_);
-    }
+    uint256[47] private __gap;
 }

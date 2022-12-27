@@ -36,14 +36,14 @@ async function main() {
   // console.log(`Treasury address: ${treasury.address}`) 
   
   // // Step 3.1: deploy contract whitelist
-  const WhiteListFactory :ContractFactory = await ethers.getContractFactory("WhiteList")
-  const whiteList = await upgrades.deployProxy(
-    WhiteListFactory,
-    ["0xc2a04b816fe6b531b5e8100e78f9dc420b081b20"],
-    {kind: "uups", initializer: "initialize"}
-    )
-  await whiteList.deployed()
-  console.log(`whiteList address: ${whiteList.address}`) 
+  // const WhiteListFactory :ContractFactory = await ethers.getContractFactory("WhiteList")
+  // const whiteList = await upgrades.deployProxy(
+  //   WhiteListFactory,
+  //   ["0xc2a04b816fe6b531b5e8100e78f9dc420b081b20"],
+  //   {kind: "uups", initializer: "initialize"}
+  //   )
+  // await whiteList.deployed()
+  // console.log(`whiteList address: ${whiteList.address}`) 
   
   // // TESTNET ONLY: deploy contract payment token for testing : testnet
   // const PMTFactory:ContractFactory = await ethers.getContractFactory("PMToken")
