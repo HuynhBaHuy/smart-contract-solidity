@@ -27,23 +27,27 @@ contract PaymentSystem is
     /// @dev convert native token to USD price
     AggregatorV3Interface public native2USD;
     mapping(address => address) public tokenFeeds;
+    uint256 priceBase;
 
     function initialize(
         address baseTokenFeed_,
         IERC20Upgradeable baseToken_,
+        uint priceBase_,
         AggregatorV3Interface native2USD_,
         ITreasury treasury_,
         IAuthority authority_
     ) external initializer {
+        __Base_init_unchained(authority_, Roles.TREASURER_ROLE);
+        __FundForwarder_init_unchained(treasury_);
+        
         native2USD = native2USD_;
         tokenFeeds[address(baseToken_)] = baseTokenFeed_;
         baseToken = baseToken_;
-        __FundForwarder_init_unchained(treasury_);
-        __Base_init_unchained(authority_, Roles.TREASURER_ROLE);
+        priceBase = priceBase_;
     }
 
     modifier supportedTokenPayment(address token_) {
-        require(tokenFeeds[token_] != address(0), "Token not supported");
+        require(tokenFeeds[token_] != address(0), "PAYMENT_SYSTEM: Unsupported token");
         _;
     }
     function supportPaymentToken (
@@ -70,11 +74,12 @@ contract PaymentSystem is
     ) external supportedTokenPayment(token_) {
         ITreasury _treasury = treasury();
         uint amount = _exchange(token_, amount_);
+        require(amount >= priceBase, "PAYMENT_SYSTEM: Amount too small");
         _safeERC20TransferFrom(
             IERC20Upgradeable(token_),
             _msgSender(),
             address(_treasury),
-            amount
+            amount_
         );
     }
 
@@ -93,6 +98,10 @@ contract PaymentSystem is
 
     function getPrice(address token_) external view returns (uint256) {
         return _getPrice(token_);
+    }
+    
+    function setPriceBase(uint256 priceBase_) external onlyRole(Roles.OPERATOR_ROLE) {
+        priceBase = priceBase_;
     }
 
     function _updateTokenFeed(
@@ -119,7 +128,7 @@ contract PaymentSystem is
         return uint256(price);
     }
 
-    function _getERC20Price(address token_) internal view returns (uint256) {
+    function _getERC20Price(address token_) internal view supportedTokenPayment(token_) returns (uint256) {
         //TODO
         (, int256 price, , , ) = AggregatorV3Interface(tokenFeeds[token_])
             .latestRoundData();

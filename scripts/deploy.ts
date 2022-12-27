@@ -6,14 +6,14 @@ dotenv.config()
 
 async function main() {  
   // // Step 1: deploy contract authority
-  const AuthorityFactory: ContractFactory = await ethers.getContractFactory("Authority");
-  const authority = await upgrades.deployProxy(
-    AuthorityFactory,
-    [],
-    { kind: "uups", "initializer": "initialize"}
-  )
-  await authority.deployed()
-  console.log(`Authority deployed to ${authority.address}`)
+  // const AuthorityFactory: ContractFactory = await ethers.getContractFactory("Authority");
+  // const authority = await upgrades.deployProxy(
+  //   AuthorityFactory,
+  //   [],
+  //   { kind: "uups", "initializer": "initialize"}
+  // )
+  // await authority.deployed()
+  // console.log(`Authority deployed to ${authority.address}`)
   
   // // Step 2: deploy contract token
   // const TokenFactory :ContractFactory = await ethers.getContractFactory("GovernanceToken")
@@ -26,14 +26,14 @@ async function main() {
   // console.log(`Token address: ${token.address}`) 
 
   // // Step 3: deploy contract treasury
-  const TreasuryFactory :ContractFactory = await ethers.getContractFactory("Treasury")
-  const treasury = await upgrades.deployProxy(
-    TreasuryFactory,
-    [authority.address],
-    {kind: "uups", initializer: "initialize"}
-    )
-  await treasury.deployed()
-  console.log(`Treasury address: ${treasury.address}`) 
+  // const TreasuryFactory :ContractFactory = await ethers.getContractFactory("Treasury")
+  // const treasury = await upgrades.deployProxy(
+  //   TreasuryFactory,
+  //   [authority.address],
+  //   {kind: "uups", initializer: "initialize"}
+  //   )
+  // await treasury.deployed()
+  // console.log(`Treasury address: ${treasury.address}`) 
   
   // // Step 3.1: deploy contract whitelist
   // const WhiteListFactory :ContractFactory = await ethers.getContractFactory("WhiteList")
@@ -100,7 +100,7 @@ async function main() {
   const PaymentSystemFactory :ContractFactory = await ethers.getContractFactory("PaymentSystem")
   const paymentSystem = await upgrades.deployProxy(
     PaymentSystemFactory,
-    ["0x1B329402Cb1825C6F30A0d92aB9E2862BE47333f","0x84b9B910527Ad5C03A9Ca831909E21e236EA7b06","0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526",treasury.address,authority.address],
+    ["0x1B329402Cb1825C6F30A0d92aB9E2862BE47333f","0x84b9B910527Ad5C03A9Ca831909E21e236EA7b06","500000000000000000","0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526","0x4ce7E3773118933f9D81D045c37D29d699C3c690","0x9c0495e415664E1C0426198b1155a9019D93202d"],
     {kind: "uups", initializer: "initialize"}
     )
   await paymentSystem.deployed()
