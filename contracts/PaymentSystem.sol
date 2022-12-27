@@ -56,6 +56,7 @@ contract PaymentSystem is
     ) external onlyRole(Roles.OPERATOR_ROLE) {
         //TODO
         _updateTokenFeed(address(token_), feed_);
+        emit PaymentTokenSupported(token_, feed_);
     }
 
     function updateBaseToken(
@@ -65,6 +66,7 @@ contract PaymentSystem is
         //TODO
         baseToken = token_;
         _updateTokenFeed(address(token_), feed_);
+        emit BaseTokenUpdated(token_, feed_);
     }
 
 
@@ -81,6 +83,7 @@ contract PaymentSystem is
             address(_treasury),
             amount_
         );
+        emit Deposited(token_, _msgSender(), amount_, amount);
     }
 
     function exchange (address token_, uint amount_) external view returns(uint256) {
