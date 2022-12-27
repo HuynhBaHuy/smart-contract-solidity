@@ -59,24 +59,24 @@ const config: HardhatUserConfig = {
             url: "https://bsc-testnet.public.blastapi.io",
             chainId: 97,
             accounts:
-                process.env.PRIVATE_KEY !== undefined
-                    ? [process.env.PRIVATE_KEY]
+                process.env.PRIVATE_KEY_TEST !== undefined
+                    ? [process.env.PRIVATE_KEY_TEST]
                     : [],
         },
         goerli: {
             url: "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
             chainId: 5,
             accounts:
-                process.env.PRIVATE_KEY !== undefined
-                    ? [process.env.PRIVATE_KEY]
+                process.env.PRIVATE_KEY_TEST !== undefined
+                    ? [process.env.PRIVATE_KEY_TEST]
                     : [],
         },
         tomoTest: {
             url: "https://rpc.testnet.tomochain.com",
             chainId: 89,
             accounts:
-                process.env.PRIVATE_KEY !== undefined
-                    ? [process.env.PRIVATE_KEY]
+                process.env.PRIVATE_KEY_TEST !== undefined
+                    ? [process.env.PRIVATE_KEY_TEST]
                     : [],
         }
     },
