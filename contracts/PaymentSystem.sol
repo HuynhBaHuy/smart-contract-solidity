@@ -19,7 +19,6 @@ contract PaymentSystem is
     ProxyCheckerUpgradeable,
     FundForwarderUpgradeable,
     IPayment
-    
 {
     using FixedPointMathLib for uint256;
 
@@ -39,7 +38,7 @@ contract PaymentSystem is
     ) external initializer {
         __Base_init_unchained(authority_, Roles.TREASURER_ROLE);
         __FundForwarder_init_unchained(treasury_);
-        
+
         native2USD = native2USD_;
         tokenFeeds[address(baseToken_)] = baseTokenFeed_;
         baseToken = baseToken_;
@@ -47,10 +46,14 @@ contract PaymentSystem is
     }
 
     modifier supportedTokenPayment(address token_) {
-        require(tokenFeeds[token_] != address(0), "PAYMENT_SYSTEM: Unsupported token");
+        require(
+            tokenFeeds[token_] != address(0),
+            "PAYMENT_SYSTEM: Unsupported token"
+        );
         _;
     }
-    function supportPaymentToken (
+
+    function supportPaymentToken(
         IERC20Upgradeable token_,
         AggregatorV3Interface feed_
     ) external onlyRole(Roles.OPERATOR_ROLE) {
@@ -69,7 +72,6 @@ contract PaymentSystem is
         emit BaseTokenUpdated(token_, feed_);
     }
 
-
     function deposit(
         address token_,
         uint256 amount_
@@ -86,11 +88,13 @@ contract PaymentSystem is
         emit Deposited(token_, _msgSender(), amount_, amount);
     }
 
-    function exchange (address token_, uint amount_) external view returns(uint256) {
+    function exchange(
+        address token_,
+        uint amount_
+    ) external view returns (uint256) {
         //TODO
         return _exchange(token_, amount_);
     }
-
 
     function updateTreasury(
         ITreasury treasury_
@@ -102,8 +106,10 @@ contract PaymentSystem is
     function getPrice(address token_) external view returns (uint256) {
         return _getPrice(token_);
     }
-    
-    function setPriceBase(uint256 priceBase_) external onlyRole(Roles.OPERATOR_ROLE) {
+
+    function setPriceBase(
+        uint256 priceBase_
+    ) external onlyRole(Roles.OPERATOR_ROLE) {
         priceBase = priceBase_;
     }
 
@@ -114,7 +120,6 @@ contract PaymentSystem is
         //TODO
         tokenFeeds[token_] = address(feed_);
     }
-
 
     function _getPrice(address token_) internal view returns (uint256) {
         //TODO
@@ -131,16 +136,19 @@ contract PaymentSystem is
         return uint256(price);
     }
 
-    function _getERC20Price(address token_) internal view supportedTokenPayment(token_) returns (uint256) {
+    function _getERC20Price(
+        address token_
+    ) internal view supportedTokenPayment(token_) returns (uint256) {
         //TODO
         (, int256 price, , , ) = AggregatorV3Interface(tokenFeeds[token_])
             .latestRoundData();
         return uint256(price);
     }
 
-
-
-    function _exchange (address token_, uint amount_) private view returns(uint256) {
+    function _exchange(
+        address token_,
+        uint amount_
+    ) private view returns (uint256) {
         //TODO
         uint256 tokenPrice = _getPrice(token_);
         uint256 baseTokenPrice = _getPrice(address(baseToken));

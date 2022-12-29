@@ -16,5 +16,6 @@ interface IWhiteList is ITreasury {
         address to_,
         uint256 amount_
     ) external;
+
     function setMaxWithdrawAmount(uint256 amount_) external;
 }

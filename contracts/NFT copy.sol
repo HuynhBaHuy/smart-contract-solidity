@@ -9,7 +9,7 @@ import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
-contract NFTCollection is
+contract NFTCollectionCopy is
     UUPSUpgradeable,
     ERC721PresetMinterPauserAutoIdUpgradeable
 {

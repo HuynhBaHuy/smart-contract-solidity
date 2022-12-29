@@ -12,12 +12,7 @@ contract APIConsumer is ChainlinkClient {
 
     event DataFullfilled(uint256 volume);
 
-    constructor(
-        address _oracle,
-        bytes32 _jobId,
-        uint256 _fee,
-        address _link
-    ) {
+    constructor(address _oracle, bytes32 _jobId, uint256 _fee, address _link) {
         if (_link == address(0)) {
             setPublicChainlinkToken();
         } else {
@@ -59,7 +54,7 @@ contract APIConsumer is ChainlinkClient {
         request.add("path", "RAW,ETH,USD,VOLUME24HOUR");
 
         // Multiply the result by 1000000000000000000 to remove decimals
-        int timesAmount = 10**18;
+        int timesAmount = 10 ** 18;
         request.addInt("times", timesAmount);
 
         // Sends the request
@@ -69,10 +64,10 @@ contract APIConsumer is ChainlinkClient {
     /**
      * Receive the response in the form of uint256
      */
-    function fulfill(bytes32 _requestId, uint256 _volume)
-        public
-        recordChainlinkFulfillment(_requestId)
-    {
+    function fulfill(
+        bytes32 _requestId,
+        uint256 _volume
+    ) public recordChainlinkFulfillment(_requestId) {
         volume = _volume;
         emit DataFullfilled(volume);
     }

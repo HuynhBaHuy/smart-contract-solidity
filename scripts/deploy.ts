@@ -74,15 +74,15 @@ async function main() {
   // console.log(`Factory ${referralTree.address}`)
 
 
-  // // Step 7: deploy contract NFT collection
-  // const NFTFactory :ContractFactory = await ethers.getContractFactory("NFTCollection")
-  // const nft = await upgrades.deployProxy(
-  //   NFTFactory,
-  //   ["AI NFTs","AIN","ipfs://QmcPccuccWbtewn7bwpxw3rhWuuT77NSXyg4ncYEGycYNg/","0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"],
-  //   {kind: "uups", initializer: "init"}
-  //   )
-  // await nft.deployed()
-  // console.log(`NFT address: ${nft.address}`) 
+  // Step 7: deploy contract NFT collection
+  const NFTFactory :ContractFactory = await ethers.getContractFactory("NFT")
+  const nft = await upgrades.deployProxy(
+    NFTFactory,
+    ["NFTMTP","MTP","ipfs://QmcGmMTyUiCPteNfDKKaDho724Y99Z9Fs7N58yJXvwBbam/","0x739dbf8e213376417a9aa4fa770ca69972bd1be6"],
+    {kind: "uups", initializer: "init"},
+    )
+  await nft.deployed()
+  console.log(`NFT address: ${nft.address}`) 
 
   // Step 8: deploy contract staking
   // const StakingFactory :ContractFactory = await ethers.getContractFactory("ERC721Staking")

@@ -38,7 +38,10 @@ contract WhiteList is
     mapping(address => bool) public withdrawed;
     uint public maxWithdrawAmount;
 
-    function initialize(IAuthority authority_, uint maxAmount_) external initializer {
+    function initialize(
+        IAuthority authority_,
+        uint maxAmount_
+    ) external initializer {
         /// @dev support native payment
         __addPayment(address(0));
         maxWithdrawAmount = maxAmount_;
@@ -47,18 +50,23 @@ contract WhiteList is
         __EIP712_init_unchained(type(WhiteList).name, "1");
     }
 
-    function addWhiteLists(address[] calldata _users) external onlyRole(Roles.TREASURER_ROLE) {
+    function addWhiteLists(
+        address[] calldata _users
+    ) external onlyRole(Roles.TREASURER_ROLE) {
         uint256 length = _users.length;
-        for (uint256 i; i < length;) {
+        for (uint256 i; i < length; ) {
             _updateWhiteListed(_users[i], true);
             unchecked {
                 ++i;
             }
         }
     }
-    function removeWhiteLists(address[] calldata _users) external onlyRole(Roles.TREASURER_ROLE) {
+
+    function removeWhiteLists(
+        address[] calldata _users
+    ) external onlyRole(Roles.TREASURER_ROLE) {
         uint256 length = _users.length;
-        for (uint256 i; i < length;) {
+        for (uint256 i; i < length; ) {
             _updateWhiteListed(_users[i], false);
             unchecked {
                 ++i;
@@ -66,14 +74,10 @@ contract WhiteList is
         }
     }
 
-
-    function _updateWhiteListed(
-        address _user, bool _isWhitelisted
-    ) private {    
+    function _updateWhiteListed(address _user, bool _isWhitelisted) private {
         whitelisted[_user] = _isWhitelisted;
         emit WhiteListUserAdded(_user);
     }
-
 
     function whiteListWithdraw(
         IERC20Upgradeable token_,
@@ -184,8 +188,10 @@ contract WhiteList is
     function supportedPayment(address token_) public view returns (bool) {
         return __payments.contains(token_);
     }
-    
-    function setMaxWithdrawAmount(uint256 _amount) external onlyRole(Roles.TREASURER_ROLE) {
+
+    function setMaxWithdrawAmount(
+        uint256 _amount
+    ) external onlyRole(Roles.TREASURER_ROLE) {
         maxWithdrawAmount = _amount;
     }
 
