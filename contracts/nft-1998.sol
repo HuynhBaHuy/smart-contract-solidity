@@ -42,8 +42,8 @@ contract NFT is UUPSUpgradeable, ERC721PresetMinterPauserAutoIdUpgradeable {
 
     owner = sender;
     cost = 300 ether;
-    maxSupply = 10_000;
-    maxMintAmount = 200;
+    maxSupply = 1988;
+    maxMintAmount = 350;
     baseExtension = ".json";
     busdContract = busdContract_;
     baseTokenURI = baseTokenURI_;
@@ -51,8 +51,9 @@ contract NFT is UUPSUpgradeable, ERC721PresetMinterPauserAutoIdUpgradeable {
     __ERC721PresetMinterPauserAutoId_init(name_, symbol_, baseTokenURI_);
 
     _grantRole(OPERATOR_ROLE, sender);
-
-    for (uint256 i = 1; i <= 650; ) {
+    
+    // _mint(sender, 1);
+    for (uint256 i = 1; i <= 350; ) {
       unchecked {
         _safeMint(sender, i);
         ++i;
@@ -71,11 +72,11 @@ contract NFT is UUPSUpgradeable, ERC721PresetMinterPauserAutoIdUpgradeable {
 
     address sender = _msgSender();
 
-    // if (!hasRole(MINTER_ROLE, sender)) {
-    if (whitelisted[sender] != true) {
-        busdContract.safeTransferFrom(sender, owner, cost * _mintAmount);
-      }
-    // }
+    if (!hasRole(MINTER_ROLE, sender)) {
+      if (whitelisted[sender] != true) {
+          busdContract.safeTransferFrom(sender, owner, cost * _mintAmount);
+        }
+    }
 
     for (uint256 i = 1; i <= _mintAmount; ) {
       unchecked {
@@ -137,15 +138,7 @@ contract NFT is UUPSUpgradeable, ERC721PresetMinterPauserAutoIdUpgradeable {
     (bool ok, ) = owner.call{ value: address(this).balance }("");
     require(ok, "NFT: TRANSFER_FAILED");
   }
-  function transferNFTs (address _from, address _to, uint256[] memory _tokenIds) external onlyRole(OPERATOR_ROLE) {
-    uint length = _tokenIds.length;
-    for (uint i; i < length; ) {
-      safeTransferFrom(_from, _to, _tokenIds[i]);
-      unchecked {
-        ++i;
-      }
-    }
-  }
+
   function _authorizeUpgrade(address implement_) internal virtual override onlyRole(UPGRADER_ROLE) {}
 
   uint256[44] private __gap;

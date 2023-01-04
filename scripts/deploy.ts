@@ -88,7 +88,7 @@ async function main() {
   // const NFTFactory :ContractFactory = await ethers.getContractFactory("NFT")
   // const nft = await upgrades.deployProxy(
   //   NFTFactory,
-  //   ["NFTMTP","MTP","ipfs://QmcGmMTyUiCPteNfDKKaDho724Y99Z9Fs7N58yJXvwBbam/","0x739dbf8e213376417a9aa4fa770ca69972bd1be6"],
+  //   ["1988 DRAGON","NGER","ipfs://QmcGmMTyUiCPteNfDKKaDho724Y99Z9Fs7N58yJXvwBbam/","0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"],
   //   {kind: "uups", initializer: "init"},
   //   )
   // await nft.deployed()

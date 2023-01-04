@@ -176,6 +176,11 @@ contract Marketplace is
         }
         return items;
     }
+    
+    function fetchMarketItem(address nftContract, uint256 tokenId) public view returns (MarketItem memory) {
+        uint256 itemId = tokenToId[tokenId][nftContract];
+        return idToMarketItem[itemId][nftContract];
+    }
 
     function handleDelete(address nftContract, uint256 tokenId) public payable {
         address sender = _msgSender();
