@@ -9,36 +9,17 @@ interface IPayment {
         IERC20Upgradeable indexed token,
         AggregatorV3Interface indexed feed
     );
-    event BaseTokenUpdated(
-        IERC20Upgradeable indexed token,
-        AggregatorV3Interface indexed feed
-    );
-    event PriceBaseUpdated(uint256 priceBase);
-    event Deposited(
-        address indexed token,
-        address indexed user,
-        uint256 amount,
-        uint256 price
-    );
 
     function supportPaymentToken(
         IERC20Upgradeable token_,
         AggregatorV3Interface feed_
     ) external;
 
-    function updateBaseToken(
-        IERC20Upgradeable token_,
-        AggregatorV3Interface feed_
-    ) external;
-
     function exchange(
-        address token_,
+        address tokenFrom_,
+        address tokenTo_,
         uint256 amount_
     ) external view returns (uint256);
 
-    function deposit(address token_, uint amount_) external;
-
     function getPrice(address token_) external view returns (uint256);
-
-    function setPriceBase(uint256 priceBase_) external;
 }

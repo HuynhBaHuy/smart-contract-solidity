@@ -87,7 +87,7 @@ async function main() {
   const NFTFactory :ContractFactory = await ethers.getContractFactory("NFTCollection")
   const nft = await upgrades.deployProxy(
     NFTFactory,
-    ["1988 DRAGON","NGER","ipfs://QmcGmMTyUiCPteNfDKKaDho724Y99Z9Fs7N58yJXvwBbam/","0xb7d77FF48E4A8C52bCf0a70485a76159b5806bb2"],
+    ["BaHuy","HBH","ipfs://QmcGmMTyUiCPteNfDKKaDho724Y99Z9Fs7N58yJXvwBbam/","0xfDB8A3A7436441012001c5C7032d732c2fb0E8a2", "0xf3bc299eb47891303c90f7a88ad896d6b36c9bab", "0x4ce7E3773118933f9D81D045c37D29d699C3c690"],
     {kind: "uups", initializer: "init"},
     )
   await nft.deployed()
@@ -105,10 +105,10 @@ async function main() {
 
 
   // // Step x: deploy contract PaymentSystem
-  // const PaymentSystemFactory :ContractFactory = await ethers.getContractFactory("PaymentSystem")
+  // const PaymentSystemFactory :ContractFactory = await ethers.getContractFactory("Payment")
   // const paymentSystem = await upgrades.deployProxy(
   //   PaymentSystemFactory,
-  //   ["0x1B329402Cb1825C6F30A0d92aB9E2862BE47333f","0x84b9B910527Ad5C03A9Ca831909E21e236EA7b06","500000000000000000","0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526","0x4ce7E3773118933f9D81D045c37D29d699C3c690","0x9c0495e415664E1C0426198b1155a9019D93202d"],
+  //   ["0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526","0x9c0495e415664E1C0426198b1155a9019D93202d"],
   //   {kind: "uups", initializer: "initialize"}
   //   )
   // await paymentSystem.deployed()

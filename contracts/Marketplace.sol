@@ -33,7 +33,7 @@ contract Marketplace is
     function _authorizeUpgrade(
         address newImplementation
     ) internal override onlyOwner {}
-    
+
     enum Status {
         PENDING, // 0
         SOLD, // 2
@@ -50,7 +50,6 @@ contract Marketplace is
         Status status;
     }
 
-
     event MarketItemCreated(
         uint indexed itemId,
         address indexed nftContract,
@@ -61,10 +60,26 @@ contract Marketplace is
         string status
     );
 
-    event MarketItemSold(uint indexed itemId, address indexed nftContract, uint indexed tokenId, address owner, address seller,  uint price, string status);
+    event MarketItemSold(
+        uint indexed itemId,
+        address indexed nftContract,
+        uint indexed tokenId,
+        address owner,
+        address seller,
+        uint price,
+        string status
+    );
 
-    event MarketItemDeleted(uint indexed itemId,address indexed nftContract, uint256 indexed tokenId,address owner, address seller, uint price, string status);
-    
+    event MarketItemDeleted(
+        uint indexed itemId,
+        address indexed nftContract,
+        uint256 indexed tokenId,
+        address owner,
+        address seller,
+        uint price,
+        string status
+    );
+
     function createToken(string memory URI) public payable returns (uint256) {
         ++_tokenIds;
         address sender = _msgSender();
@@ -73,7 +88,9 @@ contract Marketplace is
         return _tokenIds;
     }
 
-    function _getStatus (Status status) private pure returns (string memory statusString) {
+    function _getStatus(
+        Status status
+    ) private pure returns (string memory statusString) {
         if (status == Status.PENDING) {
             return "PENDING";
         } else if (status == Status.SOLD) {
@@ -149,7 +166,15 @@ contract Marketplace is
         idToMarketItem[itemId][nftContract].owner = payable(sender);
         idToMarketItem[itemId][nftContract].status = Status.SOLD;
 
-        emit MarketItemSold(itemId, nftContract, tokenId, sender, idToMarketItem[itemId][nftContract].seller , price, _getStatus(Status.SOLD));
+        emit MarketItemSold(
+            itemId,
+            nftContract,
+            tokenId,
+            sender,
+            idToMarketItem[itemId][nftContract].seller,
+            price,
+            _getStatus(Status.SOLD)
+        );
     }
 
     function fetchMarketItems(
@@ -176,8 +201,11 @@ contract Marketplace is
         }
         return items;
     }
-    
-    function fetchMarketItem(address nftContract, uint256 tokenId) public view returns (MarketItem memory) {
+
+    function fetchMarketItem(
+        address nftContract,
+        uint256 tokenId
+    ) public view returns (MarketItem memory) {
         uint256 itemId = tokenToId[tokenId][nftContract];
         return idToMarketItem[itemId][nftContract];
     }
@@ -192,13 +220,27 @@ contract Marketplace is
         idToMarketItem[itemId][nftContract].seller = payable(address(0));
         idToMarketItem[itemId][nftContract].owner = payable(sender);
         idToMarketItem[itemId][nftContract].price = 0;
-        IERC721Upgradeable(nftContract).transferFrom(address(this), sender, tokenId);
+        IERC721Upgradeable(nftContract).transferFrom(
+            address(this),
+            sender,
+            tokenId
+        );
         _itemsSold++;
         nftSold[nftContract]++;
-        emit MarketItemDeleted(itemId, nftContract, tokenId, sender, sellerAddress, 0, _getStatus(Status.CANCELLED));
+        emit MarketItemDeleted(
+            itemId,
+            nftContract,
+            tokenId,
+            sender,
+            sellerAddress,
+            0,
+            _getStatus(Status.CANCELLED)
+        );
     }
 
-    function getStatus(Status status) public pure returns (string memory statusString) {
+    function getStatus(
+        Status status
+    ) public pure returns (string memory statusString) {
         return _getStatus(status);
     }
 
