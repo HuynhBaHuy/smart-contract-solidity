@@ -9,9 +9,12 @@ import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
+import "./internal-upgradeable/PaymentUpgradeable.sol";
+
 contract NFTCollection is
     UUPSUpgradeable,
-    ERC721PresetMinterPauserAutoIdUpgradeable
+    ERC721PresetMinterPauserAutoIdUpgradeable,
+    PaymentUpgradeable
 {
     using StringsUpgradeable for uint256;
     using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -32,15 +35,14 @@ contract NFTCollection is
     uint256 public maxSupply;
     uint256 public maxMintAmount;
 
-    IERC20Upgradeable public busdContract;
 
     mapping(address => bool) public whitelisted;
-
+    
     function init(
         string calldata name_,
         string calldata symbol_,
         string calldata baseTokenURI_,
-        IERC20Upgradeable busdContract_
+        IPayment paymentSystem_
     ) external initializer {
         address sender = _msgSender();
 
@@ -49,9 +51,9 @@ contract NFTCollection is
         maxSupply = 10_000;
         maxMintAmount = 200;
         baseExtension = ".json";
-        busdContract = busdContract_;
         baseTokenURI = baseTokenURI_;
 
+        __Payment_init_unchained(paymentSystem_);
         __ERC721PresetMinterPauserAutoId_init(name_, symbol_, baseTokenURI_);
 
         _grantRole(OPERATOR_ROLE, sender);
@@ -70,22 +72,24 @@ contract NFTCollection is
         address owner
     );
 
+    function updatePayment(IPayment payment_) external override onlyRole(OPERATOR_ROLE) {
+        emit PaymentUpdated(payment(), payment_);
+        _updatePayment(payment_);
+    }
+
     // public
-    function mint(address _to, uint256 _mintAmount) external whenNotPaused {
+    function mint(address _to, uint256 _mintAmount, address _token) external whenNotPaused {
         uint256 supply = totalSupply();
         require(_mintAmount > 0);
         require(_mintAmount <= maxMintAmount);
         require(supply + _mintAmount <= maxSupply);
 
         address sender = _msgSender();
+        IPayment payment = payment();
 
         if (!hasRole(MINTER_ROLE, sender)) {
             if (whitelisted[sender] != true) {
-                busdContract.safeTransferFrom(
-                    sender,
-                    owner,
-                    cost * _mintAmount
-                );
+                payment.exchange(_token, _mintAmount * cost);
             }
         }
         for (uint256 i = 1; i <= _mintAmount; ) {
