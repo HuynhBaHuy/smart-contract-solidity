@@ -84,14 +84,14 @@ async function main() {
   // console.log(`Factory ${referralTree.address}`)
   
   // Step 7: deploy contract NFT collection
-  // const NFTFactory :ContractFactory = await ethers.getContractFactory("NFTCollection")
-  // const nft = await upgrades.deployProxy(
-  //   NFTFactory,
-  //   ["BaHuy","HBH","ipfs://QmcGmMTyUiCPteNfDKKaDho724Y99Z9Fs7N58yJXvwBbam/","0xfDB8A3A7436441012001c5C7032d732c2fb0E8a2", "0xf3bc299eb47891303c90f7a88ad896d6b36c9bab", "0x4ce7E3773118933f9D81D045c37D29d699C3c690"],
-  //   {kind: "uups", initializer: "init"},
-  //   )
-  // await nft.deployed()
-  // console.log(`NFT address: ${nft.address}`) 
+  const NFTFactory :ContractFactory = await ethers.getContractFactory("NFTCollection")
+  const nft = await upgrades.deployProxy(
+    NFTFactory,
+    ["1988Dragon","NGER","ipfs://QmcGmMTyUiCPteNfDKKaDho724Y99Z9Fs7N58yJXvwBbam/","0xB10EDd15C73033A8a2A3b7B16E7077c828b1cf22", "0xf3bc299eb47891303c90f7a88ad896d6b36c9bab"],
+    {kind: "uups", initializer: "init"},
+    )
+  await nft.deployed()
+  console.log(`NFT address: ${nft.address}`) 
 
   // Step 8: deploy contract staking
   // const StakingFactory :ContractFactory = await ethers.getContractFactory("ERC721Staking")
@@ -105,14 +105,14 @@ async function main() {
 
 
   // // Step x: deploy contract PaymentSystem
-  const PaymentSystemFactory :ContractFactory = await ethers.getContractFactory("Payment")
-  const paymentSystem = await upgrades.deployProxy(
-    PaymentSystemFactory,
-    ["0x4ce7E3773118933f9D81D045c37D29d699C3c690","0x9c0495e415664E1C0426198b1155a9019D93202d","0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526"],
-    {kind: "uups", initializer: "initialize"}
-    )
-  await paymentSystem.deployed()
-  console.log(`PaymentSystem address: ${paymentSystem.address}`)
+  // const PaymentSystemFactory :ContractFactory = await ethers.getContractFactory("Payment")
+  // const paymentSystem = await upgrades.deployProxy(
+  //   PaymentSystemFactory,
+  //   ["0x4ce7E3773118933f9D81D045c37D29d699C3c690","0x9c0495e415664E1C0426198b1155a9019D93202d","0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526"],
+  //   {kind: "uups", initializer: "initialize"}
+  //   )
+  // await paymentSystem.deployed()
+  // console.log(`PaymentSystem address: ${paymentSystem.address}`)
 
   // // Deploy API Consumer
   // const APIConsumerFactory :ContractFactory = await ethers.getContractFactory("APIConsumer")

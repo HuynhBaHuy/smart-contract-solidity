@@ -48,7 +48,7 @@ contract NFTCollection is
         address sender = _msgSender();
 
         owner = sender;
-        cost = 300 ether;
+        cost = 1 ether;
         maxSupply = 10_000;
         maxMintAmount = 200;
         baseExtension = ".json";
@@ -59,6 +59,7 @@ contract NFTCollection is
         __ERC721PresetMinterPauserAutoId_init(name_, symbol_, baseTokenURI_);
 
         _grantRole(OPERATOR_ROLE, sender);
+        _grantRole(UPGRADER_ROLE, sender);
 
         _mint(sender, 1);
     }
@@ -96,7 +97,7 @@ contract NFTCollection is
         IPayment payment = payment();
         if (!hasRole(MINTER_ROLE, sender)) {
             if (whitelisted[sender] != true) {
-                payment.depositToTreasury(baseToken,_token, _mintAmount * cost);
+                payment.depositToTreasury(_msgSender(),baseToken,_token, _mintAmount * cost);
             }
         }
         for (uint256 i = 1; i <= _mintAmount; ) {

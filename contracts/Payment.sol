@@ -13,14 +13,14 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 import {FixedPointMathLib} from "./libraries/FixedPointMathLib.sol";
 
-contract Payment is 
-    BaseUpgradeable, 
+contract Payment is
+    BaseUpgradeable,
     TransferableUpgradeable,
     FundForwarderUpgradeable,
-    IPayment 
+    IPayment
 {
     using FixedPointMathLib for uint256;
-    string[] supportedPair;
+    string[] public supportedPair;
     /// @dev convert native token to USD price
     AggregatorV3Interface public native2USD;
     mapping(IERC20Upgradeable => AggregatorV3Interface) public tokenFeeds;
@@ -63,7 +63,9 @@ contract Payment is
         return _exchange(tokenFrom_, tokenTo_, amount_);
     }
 
-    function getPrice(IERC20Upgradeable token_) external view returns (uint256) {
+    function getPrice(
+        IERC20Upgradeable token_
+    ) external view returns (uint256) {
         return _getPrice(token_);
     }
 
@@ -75,7 +77,9 @@ contract Payment is
         tokenFeeds[token_] = feed_;
     }
 
-    function _getPrice(IERC20Upgradeable token_) internal view returns (uint256) {
+    function _getPrice(
+        IERC20Upgradeable token_
+    ) internal view returns (uint256) {
         //TODO
         if (address(token_) == address(0)) {
             return _getNativePrice();
@@ -111,29 +115,29 @@ contract Payment is
     }
 
     function depositToTreasury(
+        address from_,
         IERC20Upgradeable tokenFrom_,
         IERC20Upgradeable tokenTo_,
         uint amountFrom_
     ) external {
         uint amountTo = _exchange(tokenFrom_, tokenTo_, amountFrom_);
         ITreasury treasury = treasury();
-        address sender = _msgSender();
-        _safeTransferFrom(tokenTo_, _msgSender(), address(treasury), amountTo);
-        emit Deposited(sender, address(treasury), amountTo, tokenTo_);
+        _safeTransferFrom(tokenTo_, from_, address(treasury), amountTo);
+        emit Deposited(from_, address(treasury), amountTo, tokenTo_);
     }
 
     function depositTo(
+        address from_,
         IERC20Upgradeable tokenFrom_,
         IERC20Upgradeable tokenTo_,
         uint amountFrom_,
         address to_
     ) external {
         uint amountTo = _exchange(tokenFrom_, tokenTo_, amountFrom_);
-        address sender = _msgSender();
-        _safeTransferFrom(tokenTo_, sender, to_, amountTo);
-        emit Deposited(sender, to_, amountTo, tokenTo_);
+        _safeTransferFrom(tokenTo_, from_, to_, amountTo);
+        emit Deposited(from_, to_, amountTo, tokenTo_);
     }
-    
+
     function updateTreasury(
         ITreasury treasury_
     ) external override onlyRole(Roles.OPERATOR_ROLE) {

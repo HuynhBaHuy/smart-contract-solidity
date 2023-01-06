@@ -30,7 +30,7 @@ interface IPayment {
 
     function getPrice(IERC20Upgradeable token_) external view returns (uint256);
 
-    function depositToTreasury (IERC20Upgradeable tokenFrom_, IERC20Upgradeable tokenTo_, uint amountFrom_) external;
+    function depositToTreasury (address from_, IERC20Upgradeable tokenFrom_, IERC20Upgradeable tokenTo_, uint amountFrom_) external;
 
-    function depositTo(IERC20Upgradeable tokenFrom_, IERC20Upgradeable tokenTo_, uint amountFrom_, address to_) external;
+    function depositTo(address from_, IERC20Upgradeable tokenFrom_, IERC20Upgradeable tokenTo_, uint amountFrom_, address to_) external;
 }
