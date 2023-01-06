@@ -3,6 +3,8 @@ pragma solidity 0.8.17;
 
 import "./interfaces/IPayment.sol";
 import "./internal-upgradeable/BaseUpgradeable.sol";
+import "./internal-upgradeable/TransferableUpgradeable.sol";
+import "./internal-upgradeable/FundForwarderUpgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -11,63 +13,71 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 import {FixedPointMathLib} from "./libraries/FixedPointMathLib.sol";
 
-contract Payment is BaseUpgradeable, IPayment {
+contract Payment is 
+    BaseUpgradeable, 
+    TransferableUpgradeable,
+    FundForwarderUpgradeable,
+    IPayment 
+{
     using FixedPointMathLib for uint256;
-
+    string[] supportedPair;
     /// @dev convert native token to USD price
     AggregatorV3Interface public native2USD;
-    mapping(address => address) public tokenFeeds;
+    mapping(IERC20Upgradeable => AggregatorV3Interface) public tokenFeeds;
 
     function initialize(
-        AggregatorV3Interface native2USD_,
-        IAuthority authority_
+        ITreasury treasury_,
+        IAuthority authority_,
+        AggregatorV3Interface native2USD_
     ) external initializer {
         __Base_init_unchained(authority_, Roles.TREASURER_ROLE);
-
+        __FundForwarder_init_unchained(treasury_);
         native2USD = native2USD_;
+        supportedPair.push(native2USD_.description());
     }
 
-    modifier supportedTokenPayment(address token_) {
+    modifier supportedTokenPayment(IERC20Upgradeable token_) {
         require(
-            tokenFeeds[token_] != address(0),
+            address(tokenFeeds[token_]) != address(0),
             "PAYMENT_SYSTEM: Unsupported token"
         );
         _;
     }
 
-    function supportPaymentToken(
+    function addSupportToken(
         IERC20Upgradeable token_,
         AggregatorV3Interface feed_
     ) external onlyRole(Roles.OPERATOR_ROLE) {
         //TODO
-        _updateTokenFeed(address(token_), feed_);
-        emit PaymentTokenSupported(token_, feed_);
+        _updateTokenFeed(token_, feed_);
+        supportedPair.push(feed_.description());
+        emit SupportTokenAdded(token_, feed_);
     }
 
     function exchange(
-        address tokenFrom_,
-        address tokenTo_,
+        IERC20Upgradeable tokenFrom_,
+        IERC20Upgradeable tokenTo_,
         uint amount_
     ) external view returns (uint256) {
         //TODO
         return _exchange(tokenFrom_, tokenTo_, amount_);
     }
 
-    function getPrice(address token_) external view returns (uint256) {
+    function getPrice(IERC20Upgradeable token_) external view returns (uint256) {
         return _getPrice(token_);
     }
 
     function _updateTokenFeed(
-        address token_,
+        IERC20Upgradeable token_,
         AggregatorV3Interface feed_
     ) private {
         //TODO
-        tokenFeeds[token_] = address(feed_);
+        tokenFeeds[token_] = feed_;
     }
 
-    function _getPrice(address token_) internal view returns (uint256) {
+    function _getPrice(IERC20Upgradeable token_) internal view returns (uint256) {
         //TODO
-        if (token_ == address(0)) {
+        if (address(token_) == address(0)) {
             return _getNativePrice();
         } else {
             return _getERC20Price(token_);
@@ -81,24 +91,54 @@ contract Payment is BaseUpgradeable, IPayment {
     }
 
     function _getERC20Price(
-        address token_
+        IERC20Upgradeable token_
     ) internal view supportedTokenPayment(token_) returns (uint256) {
         //TODO
-        (, int256 price, , , ) = AggregatorV3Interface(tokenFeeds[token_])
-            .latestRoundData();
+        (, int256 price, , , ) = tokenFeeds[token_].latestRoundData();
         return uint256(price);
     }
 
     function _exchange(
-        address tokenFrom_,
-        address tokenTo_,
+        IERC20Upgradeable tokenFrom_,
+        IERC20Upgradeable tokenTo_,
         uint amount_
     ) private view returns (uint256) {
         //TODO
         if (tokenFrom_ == tokenTo_) return amount_;
-        uint256 tokenFromPrice = _getPrice(address(tokenFrom_));
+        uint256 tokenFromPrice = _getPrice(tokenFrom_);
         uint256 tokenToPrice = _getPrice(tokenTo_);
         return amount_.mulDivDown(tokenToPrice, tokenFromPrice);
+    }
+
+    function depositToTreasury(
+        IERC20Upgradeable tokenFrom_,
+        IERC20Upgradeable tokenTo_,
+        uint amountFrom_
+    ) external {
+        uint amountTo = _exchange(tokenFrom_, tokenTo_, amountFrom_);
+        ITreasury treasury = treasury();
+        address sender = _msgSender();
+        _safeTransferFrom(tokenTo_, _msgSender(), address(treasury), amountTo);
+        emit Deposited(sender, address(treasury), amountTo, tokenTo_);
+    }
+
+    function depositTo(
+        IERC20Upgradeable tokenFrom_,
+        IERC20Upgradeable tokenTo_,
+        uint amountFrom_,
+        address to_
+    ) external {
+        uint amountTo = _exchange(tokenFrom_, tokenTo_, amountFrom_);
+        address sender = _msgSender();
+        _safeTransferFrom(tokenTo_, sender, to_, amountTo);
+        emit Deposited(sender, to_, amountTo, tokenTo_);
+    }
+    
+    function updateTreasury(
+        ITreasury treasury_
+    ) external override onlyRole(Roles.OPERATOR_ROLE) {
+        emit TreasuryUpdated(treasury(), treasury_);
+        _updateTreasury(treasury_);
     }
 
     uint256[47] private __gap;

@@ -10,12 +10,10 @@ import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 import "./internal-upgradeable/PaymentUpgradeable.sol";
-import "./internal-upgradeable/FundForwarderUpgradeable.sol";
 
 contract NFTCollection is
     UUPSUpgradeable,
     ERC721PresetMinterPauserAutoIdUpgradeable,
-    FundForwarderUpgradeable,
     PaymentUpgradeable
 {
     using StringsUpgradeable for uint256;
@@ -45,8 +43,7 @@ contract NFTCollection is
         string calldata symbol_,
         string calldata baseTokenURI_,
         IPayment payment_,
-        IERC20Upgradeable baseToken_,
-        ITreasury treasury_
+        IERC20Upgradeable baseToken_
     ) external initializer {
         address sender = _msgSender();
 
@@ -60,7 +57,6 @@ contract NFTCollection is
 
         __Payment_init_unchained(payment_);
         __ERC721PresetMinterPauserAutoId_init(name_, symbol_, baseTokenURI_);
-        __FundForwarder_init_unchained(treasury_);
 
         _grantRole(OPERATOR_ROLE, sender);
 
@@ -98,15 +94,9 @@ contract NFTCollection is
 
         address sender = _msgSender();
         IPayment payment = payment();
-        ITreasury treasury = treasury();
         if (!hasRole(MINTER_ROLE, sender)) {
             if (whitelisted[sender] != true) {
-                uint256 amountToken = payment.exchange(
-                    address(baseToken),
-                    address(_token),
-                    _mintAmount * cost
-                );
-                _token.safeTransferFrom(sender, address(treasury), amountToken);
+                payment.depositToTreasury(baseToken,_token, _mintAmount * cost);
             }
         }
         for (uint256 i = 1; i <= _mintAmount; ) {
@@ -190,12 +180,6 @@ contract NFTCollection is
         address implement_
     ) internal virtual override onlyRole(UPGRADER_ROLE) {}
 
-    function updateTreasury(
-        ITreasury treasury_
-    ) external override onlyRole(OPERATOR_ROLE) {
-        emit TreasuryUpdated(treasury(), treasury_);
-        _updateTreasury(treasury_);
-    }
 
     uint256[44] private __gap;
 }
