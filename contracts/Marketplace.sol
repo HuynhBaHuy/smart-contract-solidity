@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 
 contract Marketplace is
     Initializable,
@@ -36,18 +37,19 @@ contract Marketplace is
 
     enum Status {
         PENDING, // 0
-        SOLD, // 2
-        CANCELLED // 3
+        SOLD, // 1
+        CANCELLED // 2
     }
 
     struct MarketItem {
         uint itemId;
         address nftContract;
         uint256 tokenId;
-        address payable seller;
-        address payable owner;
+        address seller;
+        address owner;
         uint256 price;
         Status status;
+        IERC20Upgradeable paymentToken;
     }
 
     event MarketItemCreated(
@@ -57,7 +59,8 @@ contract Marketplace is
         address seller,
         address owner,
         uint256 price,
-        string status
+        string status,
+        IERC20Upgradeable paymentToken
     );
 
     event MarketItemSold(
@@ -67,7 +70,8 @@ contract Marketplace is
         address owner,
         address seller,
         uint price,
-        string status
+        string status,
+        IERC20Upgradeable paymentToken
     );
 
     event MarketItemDeleted(
@@ -77,10 +81,11 @@ contract Marketplace is
         address owner,
         address seller,
         uint price,
-        string status
+        string status,
+        IERC20Upgradeable paymentToken
     );
 
-    function createToken(string memory URI) public payable returns (uint256) {
+    function createToken(string memory URI) public returns (uint256) {
         ++_tokenIds;
         address sender = _msgSender();
         _mint(sender, _tokenIds);
@@ -103,21 +108,23 @@ contract Marketplace is
     function createMarketItem(
         address nftContract,
         uint256 tokenId,
-        uint256 price
-    ) public payable {
+        uint256 price,
+        IERC20Upgradeable token
+    ) public {
         require(price > 0, "Price must be greater than 0");
 
-        address sender = msg.sender;
+        address sender = _msgSender();
         ++_itemIds;
 
         idToMarketItem[_itemIds][nftContract] = MarketItem(
             _itemIds,
             nftContract,
             tokenId,
-            payable(sender),
-            payable(address(0)),
+            sender,
+            address(0),
             price,
-            Status.PENDING
+            Status.PENDING,
+            token
         );
 
         tokenToId[tokenId][nftContract] = _itemIds;
@@ -136,26 +143,26 @@ contract Marketplace is
             sender,
             address(0),
             price,
-            _getStatus(Status.PENDING)
+            _getStatus(Status.PENDING),
+            token
         );
     }
 
     function createMarketSale(
         address nftContract,
         uint256 itemId
-    ) public payable {
+    ) public {
         uint price = idToMarketItem[itemId][nftContract].price;
         uint tokenId = idToMarketItem[itemId][nftContract].tokenId;
         Status status = idToMarketItem[itemId][nftContract].status;
-        address sender = msg.sender;
-
-        require(
-            msg.value == price,
-            "Please submit the asking price in order to complete the purchase"
-        );
+        IERC20Upgradeable pmtToken = idToMarketItem[itemId][nftContract].paymentToken;
+        address seller = idToMarketItem[itemId][nftContract].seller;
+        address sender = _msgSender();
+        
         require(status == Status.PENDING, "This item is not for sale");
-
-        idToMarketItem[itemId][nftContract].seller.transfer(msg.value);
+        
+        pmtToken.transferFrom(sender, seller , price);
+        
         IERC721Upgradeable(nftContract).transferFrom(
             address(this),
             sender,
@@ -163,7 +170,7 @@ contract Marketplace is
         );
         ++_itemsSold;
         ++nftSold[nftContract];
-        idToMarketItem[itemId][nftContract].owner = payable(sender);
+        idToMarketItem[itemId][nftContract].owner = sender;
         idToMarketItem[itemId][nftContract].status = Status.SOLD;
 
         emit MarketItemSold(
@@ -173,7 +180,8 @@ contract Marketplace is
             sender,
             idToMarketItem[itemId][nftContract].seller,
             price,
-            _getStatus(Status.SOLD)
+            _getStatus(Status.SOLD),
+            pmtToken
         );
     }
 
@@ -210,15 +218,16 @@ contract Marketplace is
         return idToMarketItem[itemId][nftContract];
     }
 
-    function handleDelete(address nftContract, uint256 tokenId) public payable {
+    function handleDelete(address nftContract, uint256 tokenId) public {
         address sender = _msgSender();
         uint256 itemId = tokenToId[tokenId][nftContract];
         address sellerAddress = idToMarketItem[itemId][nftContract].seller;
+        IERC20Upgradeable pmtToken = idToMarketItem[itemId][nftContract].paymentToken;
         require(sender == sellerAddress, "Not seller");
 
         idToMarketItem[itemId][nftContract].status = Status.CANCELLED;
-        idToMarketItem[itemId][nftContract].seller = payable(address(0));
-        idToMarketItem[itemId][nftContract].owner = payable(sender);
+        idToMarketItem[itemId][nftContract].seller = address(0);
+        idToMarketItem[itemId][nftContract].owner = sender;
         idToMarketItem[itemId][nftContract].price = 0;
         IERC721Upgradeable(nftContract).transferFrom(
             address(this),
@@ -234,7 +243,8 @@ contract Marketplace is
             sender,
             sellerAddress,
             0,
-            _getStatus(Status.CANCELLED)
+            _getStatus(Status.CANCELLED),
+            pmtToken
         );
     }
 
