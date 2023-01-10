@@ -6,14 +6,14 @@ dotenv.config()
 
 async function main() {  
   // // Step 1: deploy contract marketplace
-  const MarketplaceFactory: ContractFactory = await ethers.getContractFactory("Marketplace");
-  const marketplace = await upgrades.deployProxy(
-    MarketplaceFactory,
-    [],
-    { kind: "uups", "initializer": "initialize"}
-  )
-  await marketplace.deployed()
-  console.log(`Marketplace deployed to ${marketplace.address}`)
+  // const MarketplaceFactory: ContractFactory = await ethers.getContractFactory("Marketplace");
+  // const marketplace = await upgrades.deployProxy(
+  //   MarketplaceFactory,
+  //   [],
+  //   { kind: "uups", "initializer": "initialize"}
+  // )
+  // await marketplace.deployed()
+  // console.log(`Marketplace deployed to ${marketplace.address}`)
 
   // // Step 1: deploy contract authority
   // const AuthorityFactory: ContractFactory = await ethers.getContractFactory("Authority");
@@ -84,14 +84,14 @@ async function main() {
   // console.log(`Factory ${referralTree.address}`)
   
   // Step 7: deploy contract NFT collection
-  // const NFTFactory :ContractFactory = await ethers.getContractFactory("NFTCollection")
-  // const nft = await upgrades.deployProxy(
-  //   NFTFactory,
-  //   ["1988Dragon","NGER","ipfs://QmcGmMTyUiCPteNfDKKaDho724Y99Z9Fs7N58yJXvwBbam/","0xB10EDd15C73033A8a2A3b7B16E7077c828b1cf22", "0xf3bc299eb47891303c90f7a88ad896d6b36c9bab"],
-  //   {kind: "uups", initializer: "init"},
-  //   )
-  // await nft.deployed()
-  // console.log(`NFT address: ${nft.address}`) 
+  const NFTFactory :ContractFactory = await ethers.getContractFactory("NFTCollection")
+  const nft = await upgrades.deployProxy(
+    NFTFactory,
+    ["1988Dragon","NGER","ipfs://QmcGmMTyUiCPteNfDKKaDho724Y99Z9Fs7N58yJXvwBbam/","0xB10EDd15C73033A8a2A3b7B16E7077c828b1cf22", "0xf3bc299eb47891303c90f7a88ad896d6b36c9bab"],
+    {kind: "uups", initializer: "init"},
+    )
+  await nft.deployed()
+  console.log(`NFT address: ${nft.address}`) 
 
   // Step 8: deploy contract staking
   // const StakingFactory :ContractFactory = await ethers.getContractFactory("ERC721Staking")

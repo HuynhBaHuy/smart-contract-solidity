@@ -9,14 +9,7 @@ interface IPayment {
         IERC20Upgradeable indexed token,
         AggregatorV3Interface indexed feed
     );
-
-    event Deposited(
-        address indexed sender_,
-        address indexed to_,
-        uint amount_,
-        IERC20Upgradeable token_
-    );
-
+    
     function addSupportToken(
         IERC20Upgradeable token_,
         AggregatorV3Interface feed_
@@ -30,7 +23,5 @@ interface IPayment {
 
     function getPrice(IERC20Upgradeable token_) external view returns (uint256);
 
-    function depositToTreasury (address from_, IERC20Upgradeable tokenFrom_, IERC20Upgradeable tokenTo_, uint amountFrom_) external;
-
-    function depositTo(address from_, IERC20Upgradeable tokenFrom_, IERC20Upgradeable tokenTo_, uint amountFrom_, address to_) external;
+    function getTreasury() external view returns (address);
 }

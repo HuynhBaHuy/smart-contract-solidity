@@ -3,7 +3,6 @@ pragma solidity 0.8.17;
 
 import "./interfaces/IPayment.sol";
 import "./internal-upgradeable/BaseUpgradeable.sol";
-import "./internal-upgradeable/TransferableUpgradeable.sol";
 import "./internal-upgradeable/FundForwarderUpgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
@@ -15,7 +14,6 @@ import {FixedPointMathLib} from "./libraries/FixedPointMathLib.sol";
 
 contract Payment is
     BaseUpgradeable,
-    TransferableUpgradeable,
     FundForwarderUpgradeable,
     IPayment
 {
@@ -114,28 +112,9 @@ contract Payment is
         return amount_.mulDivDown(tokenFromPrice, tokenToPrice);
     }
 
-    function depositToTreasury(
-        address from_,
-        IERC20Upgradeable tokenFrom_,
-        IERC20Upgradeable tokenTo_,
-        uint amountFrom_
-    ) external {
-        uint amountTo = _exchange(tokenFrom_, tokenTo_, amountFrom_);
+    function getTreasury() external view returns(address) {
         ITreasury treasury = treasury();
-        _safeTransferFrom(tokenTo_, from_, address(treasury), amountTo);
-        emit Deposited(from_, address(treasury), amountTo, tokenTo_);
-    }
-
-    function depositTo(
-        address from_,
-        IERC20Upgradeable tokenFrom_,
-        IERC20Upgradeable tokenTo_,
-        uint amountFrom_,
-        address to_
-    ) external {
-        uint amountTo = _exchange(tokenFrom_, tokenTo_, amountFrom_);
-        _safeTransferFrom(tokenTo_, from_, to_, amountTo);
-        emit Deposited(from_, to_, amountTo, tokenTo_);
+        return address(treasury);
     }
 
     function updateTreasury(

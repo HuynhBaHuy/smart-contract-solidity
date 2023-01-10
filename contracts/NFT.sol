@@ -87,17 +87,16 @@ contract NFTCollection is
         address _to,
         uint256 _mintAmount,
         IERC20Upgradeable _token
-    ) external whenNotPaused {
+    ) external payable whenNotPaused {
         uint256 supply = totalSupply();
         require(_mintAmount > 0);
         require(_mintAmount <= maxMintAmount);
         require(supply + _mintAmount <= maxSupply);
 
         address sender = _msgSender();
-        IPayment payment = payment();
         if (!hasRole(MINTER_ROLE, sender)) {
             if (whitelisted[sender] != true) {
-                payment.depositToTreasury(_msgSender(),baseToken,_token, _mintAmount * cost);
+                _depositToTreasury(baseToken, _token, _mintAmount * cost, sender);
             }
         }
         for (uint256 i = 1; i <= _mintAmount; ) {
