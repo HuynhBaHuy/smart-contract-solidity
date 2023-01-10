@@ -111,7 +111,7 @@ contract Payment is
         if (tokenFrom_ == tokenTo_) return amount_;
         uint256 tokenFromPrice = _getPrice(tokenFrom_);
         uint256 tokenToPrice = _getPrice(tokenTo_);
-        return amount_.mulDivDown(tokenToPrice, tokenFromPrice);
+        return amount_.mulDivDown(tokenFromPrice, tokenToPrice);
     }
 
     function depositToTreasury(

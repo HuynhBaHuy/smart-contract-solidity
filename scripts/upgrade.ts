@@ -1,11 +1,11 @@
 import { Contract, ContractFactory } from "ethers";
 import { ethers, upgrades } from "hardhat";
 // 
-const proxyAddress: string = "0x6c864714e36c66c6a5557426e2E13deA899fD2B0";
+const proxyAddress: string = "0xB10EDd15C73033A8a2A3b7B16E7077c828b1cf22";
 
 async function main(): Promise<void> {
   console.log("Deploying Proxy contract...");
-  const factory: ContractFactory = await ethers.getContractFactory("NFTCollection");
+  const factory: ContractFactory = await ethers.getContractFactory("Payment");
   const contract: Contract = await upgrades.upgradeProxy(proxyAddress, factory);
   await contract.deployed();
   console.log("Logic Proxy Contract deployed to : ", contract.address);
